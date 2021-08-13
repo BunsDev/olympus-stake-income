@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      h1 {
+        margin: 0;
+        font-size: 8vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      @media (orientation: portrait) {
+        h1 {
+          font-size: 3vh;
+        }
+      }
+
+      .profit {
+        color: rgb(67, 170, 72)
+      }
+
+      .lose {
+        color: rgb(211, 42, 42)
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <h1 id="profit"></h1>
+      <h1 id="rub"></h1>
+      <h1 id="usd"></h1>
+      <h1 id="ohm"></h1>
+    </div>
+    <script>
+      let delta = 0
+      let timestamp = 0
+      let balance = 0
+      let ohmPrice = 0
+      let usd2rub = 0
+      let spent = 0
+      const ws = new WebSocket(`ws://${location.host}`);
+      ws.addEventListener('message', (message) => {
+        ({ delta, timestamp, balance, ohmPrice, usd2rub, spent } = JSON.parse(message.data));
+      });
+      const profitEl = document.getElementById('profit')
+      const rubEl = document.getElementById('rub')
+      const usdEl = document.getElementById('usd')
+      const ohmEl = document.getElementById('ohm')
+      const showProfitInt = setInterval(() => {
+        const reward = (delta * Math.min(8 * 60 * 60 * 1000, Date.now() - timestamp * 1000)) / 100;
+        const newBalance = balance + reward;
+        const valueUSD = newBalance * ohmPrice;
+        const valueRUB = valueUSD * usd2rub;
+        const profit = ((valueUSD - spent) * usd2rub).toFixed(2);
+        profitEl.className = profit > 0 ? 'profit': 'lose'
+        profitEl.innerText = profit > 0 ? `₽+${profit}` : `₽${profit}`
+        rubEl.innerText = `₽ ${valueRUB.toFixed(2)}`
+        usdEl.innerText = `$ ${valueUSD.toFixed(5)}`
+        ohmEl.innerText = `Ω ${newBalance.toFixed(9)}`
+      }, 100);
+    </script>
+  </body>
+</html>
