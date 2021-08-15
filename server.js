@@ -14,14 +14,14 @@ const server = createServer(function (_req, res) {
   });
 });
 const wss = new WebSocketServer({ server });
-let data = null;
+let data = {};
 
 wss.on("connection", (ws) => {
   if (data) ws.send(JSON.stringify(data));
 });
 export function broadcastData(update) {
-  data = update;
-  wss.clients.forEach((ws) => ws.send(JSON.stringify(update)));
+  Object.keys(update).forEach((key) => (data[key] = Number(update[key].toString())));
+  wss.clients.forEach((ws) => ws.send(JSON.stringify(data)));
 }
 
 server.listen(8000);
