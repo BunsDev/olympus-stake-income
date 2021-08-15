@@ -47,7 +47,7 @@ function updateSpending(balance, prevBalance, rebaseIndex) {
   }
 
   const sohmDelta = Big(balance.sohmBalance).minus(sohmBalance);
-  const price = Big(balance.dollarBalance).div(balance.sohmBalance);
+  const price = Big(balance.dollarBalance).div(Big(balance.sohmBalance).plus(balance.ohmBalance));
 
   // TODO unstake?
   ohmPurchased = ohmPurchased.plus(sohmDelta);
@@ -65,6 +65,7 @@ async function calculateSpending() {
         ohmie(id: "${wallet}") {
           historicBalance(orderBy: timestamp) {
             timestamp
+            ohmBalance
             sohmBalance
             dollarBalance
           }
