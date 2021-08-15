@@ -21,5 +21,6 @@ Additionally scripts output in console info
 ### What doesn't work
 
 - Bonds
+- Old sOHM
 - Fuse pools
 - Ustake (Not sure)
